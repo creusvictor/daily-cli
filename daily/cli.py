@@ -60,9 +60,9 @@ def did(
     insert_bullet("did", text, tags=tag_list)
 
     if tag_list:
-        typer.echo(f"✓ Added to Yesterday: {text} #tags: {','.join(tag_list)}")
+        typer.echo(f"✓ Added to Done: {text} #tags: {','.join(tag_list)}")
     else:
-        typer.echo(f"✓ Added to Yesterday: {text}")
+        typer.echo(f"✓ Added to Done: {text}")
 
 
 @app.command()
@@ -77,9 +77,9 @@ def plan(
     insert_bullet("plan", text, tags=tag_list)
 
     if tag_list:
-        typer.echo(f"✓ Added to Today: {text} #tags: {','.join(tag_list)}")
+        typer.echo(f"✓ Added to To Do: {text} #tags: {','.join(tag_list)}")
     else:
-        typer.echo(f"✓ Added to Today: {text}")
+        typer.echo(f"✓ Added to To Do: {text}")
 
 
 @app.command()
