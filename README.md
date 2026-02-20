@@ -2,8 +2,8 @@
 
 Minimalist CLI for engineers to log daily work. Perfect for daily standups.
 
-[![PyPI version](https://badge.fury.io/py/daily-cli.svg)](https://pypi.org/project/daily-cli/)
-[![Python versions](https://img.shields.io/pypi/pyversions/daily-cli.svg)](https://pypi.org/project/daily-cli/)
+[![PyPI version](https://badge.fury.io/py/daily-cli-tool.svg)](https://pypi.org/project/daily-cli-tool/)
+[![Python versions](https://img.shields.io/pypi/pyversions/daily-cli-tool.svg)](https://pypi.org/project/daily-cli-tool/)
 
 ## Features
 
@@ -19,7 +19,7 @@ Minimalist CLI for engineers to log daily work. Perfect for daily standups.
 ### Using pipx (recommended)
 
 ```bash
-pipx install daily-cli
+pipx install daily-cli-tool
 ```
 
 That's it! The `daily` command is now available globally.

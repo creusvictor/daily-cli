@@ -1,4 +1,4 @@
-# 🎉 daily-cli v1.0.0 - Initial Release
+# 🎉 daily-cli-tool v1.0.0 - Initial Release
 
 Minimalist CLI for engineers to log daily work and prepare for standups.
 
@@ -37,7 +37,7 @@ Minimalist CLI for engineers to log daily work and prepare for standups.
 ## 📦 Installation
 
 ```bash
-pipx install daily-cli
+pipx install daily-cli-tool
 ```
 
 ## 🚀 Quick Start

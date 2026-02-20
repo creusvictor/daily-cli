@@ -1,5 +1,5 @@
 [project]
-name = "daily-cli"
+name = "daily-cli-tool"
 version = "1.0.0"
 description = "Minimalist CLI for engineers to log daily work"
 readme = "README.md"
