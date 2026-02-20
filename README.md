@@ -2,17 +2,43 @@
 
 Minimalist CLI for engineers to log daily work. Perfect for daily standups.
 
+[![PyPI version](https://badge.fury.io/py/daily-cli.svg)](https://pypi.org/project/daily-cli/)
+[![Python versions](https://img.shields.io/pypi/pyversions/daily-cli.svg)](https://pypi.org/project/daily-cli/)
+
 ## Features
 
 - **Fast capture**: Log work in under 10 seconds
 - **Markdown-based**: Human-readable files, Git-friendly
 - **Tag support**: Filter entries by project or topic
 - **Cheat sheet**: Quick summary for daily standups
+- **Interactive search**: Browse and edit past notes with fzf
 - **No database**: Plain files in `~/.daily/dailies/`
 
 ## Installation
 
-### Using uv (recommended)
+### Using pipx (recommended)
+
+```bash
+pipx install daily-cli
+```
+
+That's it! The `daily` command is now available globally.
+
+### From source (for development)
+
+```bash
+# Clone the repository
+git clone https://github.com/creusvictor/daily-cli.git
+cd daily-cli
+
+# Install with pipx
+pipx install .
+
+# Or install with uv
+uv sync
+```
+
+### Using uv (for development)
 
 ```bash
 # Clone the repository
@@ -68,6 +94,7 @@ daily cheat
 | `daily block "text"` | Log a blocker | Blockers |
 | `daily meeting "text"` | Log a meeting | Meetings |
 | `daily cheat` | Show standup cheat sheet | - |
+| `daily search` | Search and open daily files | - |
 
 All commands support `--tags` or `-t` for tagging:
 
@@ -132,6 +159,40 @@ Configure the default in `~/.daily/config.toml`:
 ```toml
 # Set to false to always use literal yesterday
 skip_weekends = true
+```
+
+## Search
+
+The `daily search` command provides an interactive fuzzy finder (fzf) to browse and edit your daily notes:
+
+```bash
+# Search all daily files
+daily search
+
+# Filter by tags (only show files with these tags)
+daily search --tags aws,deploy
+daily search -t projectA
+```
+
+**Features**:
+- **Interactive selection**: Use arrow keys or fuzzy search to find notes
+- **Preview panel**: See the content of each note before opening
+- **Opens in $EDITOR**: Selected file opens in your preferred editor (vim, nano, etc.)
+- **Tag filtering**: Only show files containing specific tags
+- **Sorted by date**: Newest files appear first
+- **Tag display**: Each file shows all tags used (e.g., `2026-02-20 (Friday) - tags: aws,deploy`)
+
+**Requirements**: This command requires `fzf` to be installed:
+
+```bash
+# Ubuntu/Debian
+sudo apt-get install fzf
+
+# macOS
+brew install fzf
+
+# Arch Linux
+sudo pacman -S fzf
 ```
 
 ## File Structure

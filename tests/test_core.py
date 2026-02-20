@@ -126,7 +126,7 @@ class TestEnsureDailyFileExists:
         content = result.read_text()
         assert "type: daily" in content
         assert "date: 2026-01-26" in content
-        assert "## ✅ Yesterday" in content
+        assert "## ✅ Done" in content
 
     def test_ensure_daily_file_exists_idempotent(self, temp_dailies_dir):
         """Doesn't overwrite existing file."""
@@ -165,7 +165,7 @@ class TestReadDailyFile:
         content = read_daily_file(date)
 
         assert "type: daily" in content
-        assert "## ✅ Yesterday" in content
+        assert "## ✅ Done" in content
 
     def test_read_daily_file_not_found(self, temp_dailies_dir):
         """Raises error if file doesn't exist."""
@@ -343,16 +343,16 @@ class TestGenerateCheat:
         assert "▶️" not in cheat
         assert "🚧" not in cheat
 
-    def test_generate_cheat_removes_tags(self, temp_dailies_dir):
-        """Doesn't show tags in output."""
+    def test_generate_cheat_shows_tags(self, temp_dailies_dir):
+        """Shows tags in output."""
         date = datetime(2026, 1, 26)
         insert_bullet("did", "Deploy", tags=["cicd", "aws"], date=date)
 
         cheat = generate_cheat(date=date)
 
         assert "Deploy" in cheat
-        assert "#tags:" not in cheat
-        assert "cicd" not in cheat
+        assert "#tags:" in cheat
+        assert "cicd" in cheat
 
     def test_generate_cheat_with_filter_tags(self, temp_dailies_dir):
         """Filters bullets by tags."""

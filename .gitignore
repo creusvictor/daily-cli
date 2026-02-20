@@ -50,8 +50,4 @@ Thumbs.db
 dailies/
 
 # Internal docs (not for public repo)
-CLAUDE.md
-PLANNING.md
-TASKS.md
 .python-version
-.claude/

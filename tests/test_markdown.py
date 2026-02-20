@@ -32,8 +32,8 @@ class TestCreateDailyTemplate:
         date = datetime(2026, 1, 26)
         template = create_daily_template(date)
 
-        assert "## ✅ Yesterday" in template
-        assert "## ▶️ Today" in template
+        assert "## ✅ Done" in template
+        assert "## ▶️ To Do" in template
         assert "## 🚧 Blockers" in template
         assert "## 🗓 Meetings" in template
         assert "## 🧠 Quick Notes" in template
@@ -79,15 +79,15 @@ class TestInsertAtSection:
 
     def test_insert_in_empty_section(self):
         """Inserts in an empty section."""
-        content = "## ✅ Yesterday\n\n## ▶️ Today\n"
-        result = insert_at_section(content, "## ✅ Yesterday", "Completed task")
+        content = "## ✅ Done\n\n## ▶️ To Do\n"
+        result = insert_at_section(content, "## ✅ Done", "Completed task")
 
         assert "- Completed task" in result
         lines = result.split("\n")
-        yesterday_idx = lines.index("## ✅ Yesterday")
-        today_idx = lines.index("## ▶️ Today")
+        done_idx = lines.index("## ✅ Done")
+        todo_idx = lines.index("## ▶️ To Do")
         bullet_idx = lines.index("- Completed task")
-        assert yesterday_idx < bullet_idx < today_idx
+        assert done_idx < bullet_idx < todo_idx
 
     def test_insert_preserves_existing_bullets(self):
         """Doesn't overwrite existing bullets."""

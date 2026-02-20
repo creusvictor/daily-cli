@@ -13,7 +13,9 @@ from daily.markdown import (
 )
 
 
-def get_previous_workday(date: datetime | None = None, skip_weekends: bool = True) -> datetime:
+def get_previous_workday(
+    date: datetime | None = None, skip_weekends: bool = True
+) -> datetime:
     """Get the previous day, optionally skipping weekends.
 
     When skip_weekends is True:
@@ -164,9 +166,7 @@ def insert_bullet(
     return write_daily_file(new_content, date)
 
 
-def get_bullets_from_section(
-    section: str, date: datetime | None = None
-) -> list[str]:
+def get_bullets_from_section(section: str, date: datetime | None = None) -> list[str]:
     """Get all bullets from a section.
 
     Args:
@@ -278,10 +278,113 @@ def generate_cheat_data(
         if filter_tags:
             bullets = filter_bullets_by_tags(bullets, filter_tags)
 
-        result.append({
-            "title": title,
-            "key": section_key,
-            "bullets": bullets,
-        })
+        result.append(
+            {
+                "title": title,
+                "key": section_key,
+                "bullets": bullets,
+            }
+        )
 
     return result
+
+
+def list_daily_files(
+    filter_tags: list[str] | None = None,
+) -> list[tuple[Path, datetime]]:
+    """List all daily files, optionally filtered by tags.
+
+    Args:
+        filter_tags: Optional list of tags to filter by.
+
+    Returns:
+        List of tuples (file_path, date) sorted by date descending (newest first).
+    """
+    dailies_dir = get_dailies_dir()
+
+    # Find all daily markdown files
+    daily_files = []
+    for file_path in dailies_dir.glob("*-daily.md"):
+        try:
+            # Parse date from filename (YYYY-MM-DD-daily.md)
+            date_str = file_path.stem.replace("-daily", "")
+            file_date = datetime.strptime(date_str, "%Y-%m-%d")
+
+            # If tags filter is specified, check if file contains any of the tags
+            if filter_tags:
+                content = file_path.read_text()
+                # Check if ANY bullet in the file has at least one of the tags
+                has_matching_bullet = False
+                for section_title in SECTIONS.values():
+                    bullets = extract_bullets_from_section(content, section_title)
+                    filtered = filter_bullets_by_tags(bullets, filter_tags)
+                    if filtered:
+                        has_matching_bullet = True
+                        break
+
+                if not has_matching_bullet:
+                    continue
+
+            daily_files.append((file_path, file_date))
+        except (ValueError, OSError):
+            # Skip files that don't match expected format or can't be read
+            continue
+
+    # Sort by date descending (newest first)
+    daily_files.sort(key=lambda x: x[1], reverse=True)
+
+    return daily_files
+
+
+def get_all_tags_from_file(file_path: Path) -> set[str]:
+    """Extract all unique tags from a daily file.
+
+    Args:
+        file_path: Path to the daily file.
+
+    Returns:
+        Set of unique tags found in the file.
+    """
+    try:
+        content = file_path.read_text()
+        all_tags = set()
+
+        for section_title in SECTIONS.values():
+            bullets = extract_bullets_from_section(content, section_title)
+            for bullet in bullets:
+                from daily.markdown import parse_tags
+
+                tags = parse_tags(bullet)
+                all_tags.update(tags)
+
+        return all_tags
+    except OSError:
+        return set()
+
+
+def format_daily_file_for_display(file_path: Path, file_date: datetime) -> str:
+    """Format a daily file for display in search results.
+
+    Args:
+        file_path: Path to the daily file.
+        file_date: Date of the daily file.
+
+    Returns:
+        Formatted string for display (e.g., "2026-01-26 (Monday) - tags: aws,cicd").
+    """
+    # Get day of week
+    day_name = file_date.strftime("%A")
+
+    # Get all tags
+    try:
+        tags = get_all_tags_from_file(file_path)
+
+        base_display = f"{file_date.strftime('%Y-%m-%d')} ({day_name})"
+
+        if tags:
+            tags_display = ",".join(sorted(tags))
+            return f"{base_display} - tags: {tags_display}"
+        else:
+            return base_display
+    except OSError:
+        return f"{file_date.strftime('%Y-%m-%d')} ({day_name})"

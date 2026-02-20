@@ -28,14 +28,14 @@ class TestDidCommand:
         result = runner.invoke(app, ["did", "Completed task"])
 
         assert result.exit_code == 0
-        assert "Added to Yesterday" in result.output
+        assert "Added to Done" in result.output
 
         # Verify file was created
         file_path = get_daily_file_path()
         assert file_path.exists()
 
     def test_did_command_inserts_bullet(self, temp_dailies_dir):
-        """Inserts bullet in Yesterday section."""
+        """Inserts bullet in Done section."""
         runner.invoke(app, ["did", "Deploy completed"])
 
         content = read_daily_file()
@@ -43,11 +43,11 @@ class TestDidCommand:
 
         # Verify it's in the correct section
         lines = content.split("\n")
-        yesterday_idx = next(i for i, l in enumerate(lines) if "## ✅ Yesterday" in l)
-        today_idx = next(i for i, l in enumerate(lines) if "## ▶️ Today" in l)
+        done_idx = next(i for i, l in enumerate(lines) if "## ✅ Done" in l)
+        todo_idx = next(i for i, l in enumerate(lines) if "## ▶️ To Do" in l)
         bullet_idx = next(i for i, l in enumerate(lines) if "- Deploy completed" in l)
 
-        assert yesterday_idx < bullet_idx < today_idx
+        assert done_idx < bullet_idx < todo_idx
 
     def test_did_command_with_tags(self, temp_dailies_dir):
         """Formats tags correctly."""
@@ -71,22 +71,22 @@ class TestPlanCommand:
     """Tests for the plan command."""
 
     def test_plan_command_inserts_bullet(self, temp_dailies_dir):
-        """Inserts bullet in Today section."""
+        """Inserts bullet in To Do section."""
         result = runner.invoke(app, ["plan", "Review PR"])
 
         assert result.exit_code == 0
-        assert "Added to Today" in result.output
+        assert "Added to To Do" in result.output
 
         content = read_daily_file()
         assert "- Review PR" in content
 
         # Verify it's in the correct section
         lines = content.split("\n")
-        today_idx = next(i for i, l in enumerate(lines) if "## ▶️ Today" in l)
+        todo_idx = next(i for i, l in enumerate(lines) if "## ▶️ To Do" in l)
         blockers_idx = next(i for i, l in enumerate(lines) if "## 🚧 Blockers" in l)
         bullet_idx = next(i for i, l in enumerate(lines) if "- Review PR" in l)
 
-        assert today_idx < bullet_idx < blockers_idx
+        assert todo_idx < bullet_idx < blockers_idx
 
     def test_plan_command_with_tags(self, temp_dailies_dir):
         """Formats tags correctly."""
@@ -114,7 +114,9 @@ class TestBlockCommand:
         lines = content.split("\n")
         blockers_idx = next(i for i, l in enumerate(lines) if "## 🚧 Blockers" in l)
         meetings_idx = next(i for i, l in enumerate(lines) if "## 🗓 Meetings" in l)
-        bullet_idx = next(i for i, l in enumerate(lines) if "- Waiting for AWS permissions" in l)
+        bullet_idx = next(
+            i for i, l in enumerate(lines) if "- Waiting for AWS permissions" in l
+        )
 
         assert blockers_idx < bullet_idx < meetings_idx
 
@@ -204,7 +206,9 @@ class TestCommandHelp:
         result = runner.invoke(app, ["did", "--help"])
 
         assert result.exit_code == 0
-        assert "completed" in result.output.lower() or "yesterday" in result.output.lower()
+        assert (
+            "completed" in result.output.lower() or "yesterday" in result.output.lower()
+        )
         assert "--tags" in result.output
 
     def test_plan_help(self):
@@ -370,12 +374,15 @@ class TestCheatWeekendLogic:
         monday = datetime(2026, 2, 2)
 
         # Ensure config returns True for skip_weekends
-        monkeypatch.setattr("daily.config.CONFIG_FILE", temp_dailies_dir / "nonexistent.toml")
+        monkeypatch.setattr(
+            "daily.config.CONFIG_FILE", temp_dailies_dir / "nonexistent.toml"
+        )
 
         with patch("daily.core.datetime") as mock_dt:
             mock_dt.now.return_value = monday
             # timedelta still needs to work
             from datetime import timedelta
+
             mock_dt.side_effect = lambda *args, **kwargs: datetime(*args, **kwargs)
 
             result = runner.invoke(app, ["cheat"])
@@ -383,7 +390,9 @@ class TestCheatWeekendLogic:
         assert result.exit_code == 0
         assert "Friday work" in result.output
 
-    def test_cheat_no_workdays_shows_literal_yesterday(self, temp_dailies_dir, monkeypatch):
+    def test_cheat_no_workdays_shows_literal_yesterday(
+        self, temp_dailies_dir, monkeypatch
+    ):
         """--no-workdays shows literal yesterday even on Monday."""
         from datetime import datetime
         from unittest.mock import patch
@@ -438,7 +447,9 @@ class TestCheatWeekendLogic:
         assert "Friday work" in result.output
         assert "Sunday work" not in result.output
 
-    def test_cheat_respects_config_skip_weekends_false(self, temp_dailies_dir, monkeypatch):
+    def test_cheat_respects_config_skip_weekends_false(
+        self, temp_dailies_dir, monkeypatch
+    ):
         """Respects config skip_weekends=false."""
         from datetime import datetime
         from unittest.mock import patch
