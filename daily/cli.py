@@ -125,6 +125,23 @@ def meeting(
 
 
 @app.command()
+def quick(
+    text: str = typer.Argument(..., help="Quick note"),
+    tags: str = typer.Option(None, "--tags", "-t", help="Comma-separated tags"),
+) -> None:
+    """Add quick note (Quick Notes section)."""
+    text = validate_text(text)
+    tag_list = parse_tags(tags)
+
+    insert_bullet("notes", text, tags=tag_list)
+
+    if tag_list:
+        typer.echo(f"✓ Added to Quick Notes: {text} #tags: {','.join(tag_list)}")
+    else:
+        typer.echo(f"✓ Added to Quick Notes: {text}")
+
+
+@app.command()
 def cheat(
     tags: str = typer.Option(None, "--tags", "-t", help="Filter by tags"),
     plain: bool = typer.Option(
@@ -209,6 +226,7 @@ def _print_cheat_rich(data: list[dict], date=None) -> None:
         "meeting": ("bold blue", "🗓"),
         "plan": ("bold yellow", "▶️"),
         "block": ("bold red", "🚧"),
+        "notes": ("bold magenta", "🧠"),
     }
 
     # Show which date we're reading

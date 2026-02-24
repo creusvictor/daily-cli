@@ -387,7 +387,7 @@ class TestGenerateCheat:
             generate_cheat(date=date)
 
     def test_generate_cheat_includes_meetings(self, temp_dailies_dir):
-        """Includes Done, Meetings, To Do, Blockers (not Notes)."""
+        """Includes Done, Meetings, To Do, Blockers, and Quick Notes."""
         date = datetime(2026, 1, 26)
         insert_bullet("did", "Task", date=date)
         insert_bullet("meeting", "Important meeting", date=date)
@@ -399,6 +399,7 @@ class TestGenerateCheat:
         assert "MEETINGS" in cheat
         assert "TO DO" in cheat
         assert "BLOCKERS" in cheat
+        assert "QUICK NOTES" in cheat
         assert "Important meeting" in cheat
-        # Quick notes are not included in cheat
-        assert "Quick note" not in cheat
+        # Quick notes are now included in cheat
+        assert "Quick note" in cheat

@@ -108,6 +108,9 @@ daily block "Waiting for AWS access" --tags aws
 # Log a meeting
 daily meeting "Sprint planning" --tags team
 
+# Add a quick note
+daily quick "Check new API documentation" --tags api
+
 # Show cheat sheet for standup
 daily cheat
 ```
@@ -120,6 +123,7 @@ daily cheat
 | `daily plan "text"` | Plan work for today | To Do |
 | `daily block "text"` | Log a blocker | Blockers |
 | `daily meeting "text"` | Log a meeting | Meetings |
+| `daily quick "text"` | Add a quick note | Quick Notes |
 | `daily cheat` | Show standup cheat sheet | - |
 | `daily search` | Search and open daily files | - |
 
@@ -149,6 +153,9 @@ TO DO
 
 BLOCKERS
 - Waiting for AWS access
+
+QUICK NOTES
+- Check new API documentation
 ```
 
 ### Options

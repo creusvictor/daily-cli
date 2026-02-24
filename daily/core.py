@@ -266,6 +266,7 @@ def generate_cheat_data(
         ("MEETINGS", "meeting"),
         ("TO DO", "plan"),
         ("BLOCKERS", "block"),
+        ("QUICK NOTES", "notes"),
     ]
 
     result = []
