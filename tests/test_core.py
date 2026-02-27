@@ -403,3 +403,43 @@ class TestGenerateCheat:
         assert "Important meeting" in cheat
         # Quick notes are now included in cheat
         assert "Quick note" in cheat
+
+    def test_generate_cheat_with_typo_in_section_header(self, temp_dailies_dir):
+        """Handles typos in section headers gracefully with fuzzy matching."""
+        from pathlib import Path
+
+        from daily.config import DAILY_FILE_FORMAT, get_dailies_dir
+
+        date = datetime(2026, 1, 27)
+        dailies_dir = get_dailies_dir()
+        file_path = dailies_dir / date.strftime(DAILY_FILE_FORMAT)
+
+        # Create a file with a typo in the Quick Notes section header
+        content = """---
+type: daily
+date: 2026-01-27
+---
+
+## ✅ Done
+- Completed task
+
+## ▶️ To Do
+
+## 🚧 Blockers
+
+## 🗓 Meetings
+- Team meeting
+
+## 🧠 Quick Notesa
+- Important quick note
+"""
+        file_path.write_text(content, encoding="utf-8")
+
+        cheat = generate_cheat(date=date)
+
+        # Should still find the quick note despite the typo "Notesa" instead of "Notes"
+        assert "QUICK NOTES" in cheat
+        assert "Important quick note" in cheat
+        # Quick note should NOT appear in meetings
+        assert cheat.index("MEETINGS") < cheat.index("Team meeting")
+        assert cheat.index("Team meeting") < cheat.index("QUICK NOTES")

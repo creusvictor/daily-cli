@@ -44,9 +44,24 @@ def find_section(content: str, section_title: str) -> int:
         Line index where the section is, or -1 if not found.
     """
     lines = content.split("\n")
+
+    # First try exact match
     for i, line in enumerate(lines):
         if line.strip() == section_title:
             return i
+
+    # If no exact match, try fuzzy matching with emoji and first keyword
+    # Extract emoji and first keyword from section_title
+    # E.g., "## 🧠 Quick Notes" -> look for lines starting with "## 🧠 Quick"
+    if section_title.startswith("## ") and len(section_title) > 3:
+        # Get everything up to the first space after the emoji
+        parts = section_title.split()
+        if len(parts) >= 3:  # ["##", "emoji", "first_word", ...]
+            fuzzy_pattern = f"{parts[0]} {parts[1]} {parts[2]}"
+            for i, line in enumerate(lines):
+                if line.strip().startswith(fuzzy_pattern):
+                    return i
+
     return -1
 
 
@@ -61,10 +76,10 @@ def find_next_section(content: str, after_line: int) -> int:
         Index of the next section, or total lines if none found.
     """
     lines = content.split("\n")
-    section_titles = set(SECTIONS.values())
 
     for i in range(after_line + 1, len(lines)):
-        if lines[i].strip() in section_titles:
+        # Match any line starting with ## (h2 header) to be more tolerant to typos
+        if lines[i].strip().startswith("##"):
             return i
 
     return len(lines)
