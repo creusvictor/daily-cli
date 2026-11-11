@@ -34,6 +34,19 @@ class TestDidCommand:
         file_path = get_daily_file_path()
         assert file_path.exists()
 
+    def test_did_command_reports_corrupt_file_cleanly(self, temp_dailies_dir):
+        """Missing section header exits 1 with an error, not a traceback."""
+        file_path = get_daily_file_path()
+        file_path.write_text(
+            "---\ntype: daily\n---\n\nSome random content\n", encoding="utf-8"
+        )
+
+        result = runner.invoke(app, ["did", "New task"])
+
+        assert result.exit_code == 1
+        assert "Traceback (most recent call last)" not in result.output
+        assert "error" in result.output.lower()
+
     def test_did_command_inserts_bullet(self, temp_dailies_dir):
         """Inserts bullet in Done section."""
         runner.invoke(app, ["did", "Deploy completed"])
