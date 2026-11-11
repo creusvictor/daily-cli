@@ -59,6 +59,20 @@ def parse_tags(tags: str | None) -> list[str] | None:
     return [tag.strip() for tag in tags.split(",") if tag.strip()]
 
 
+def _insert_bullet(section: str, text: str, tags: list[str] | None) -> None:
+    """Insert a bullet, reporting a corrupt daily file as a clean CLI error.
+
+    A daily file whose section header was hand-removed makes
+    ``insert_bullet`` raise ``ValueError``. Surfacing that as a traceback
+    hides which file is broken; exit non-zero with the message instead.
+    """
+    try:
+        insert_bullet(section, text, tags=tags)
+    except ValueError as e:
+        console.print(f"[red]Error: {e}[/red]")
+        raise typer.Exit(1)
+
+
 def validate_text(text: str) -> str:
     """Validate that text is not empty.
 
@@ -86,7 +100,7 @@ def did(
     text = validate_text(text)
     tag_list = parse_tags(tags)
 
-    insert_bullet("did", text, tags=tag_list)
+    _insert_bullet("did", text, tag_list)
 
     if tag_list:
         typer.echo(f"✓ Added to Done: {text} #tags: {','.join(tag_list)}")
@@ -103,7 +117,7 @@ def plan(
     text = validate_text(text)
     tag_list = parse_tags(tags)
 
-    insert_bullet("plan", text, tags=tag_list)
+    _insert_bullet("plan", text, tag_list)
 
     if tag_list:
         typer.echo(f"✓ Added to To Do: {text} #tags: {','.join(tag_list)}")
@@ -120,7 +134,7 @@ def block(
     text = validate_text(text)
     tag_list = parse_tags(tags)
 
-    insert_bullet("block", text, tags=tag_list)
+    _insert_bullet("block", text, tag_list)
 
     if tag_list:
         typer.echo(f"✓ Added to Blockers: {text} #tags: {','.join(tag_list)}")
@@ -137,7 +151,7 @@ def meeting(
     text = validate_text(text)
     tag_list = parse_tags(tags)
 
-    insert_bullet("meeting", text, tags=tag_list)
+    _insert_bullet("meeting", text, tag_list)
 
     if tag_list:
         typer.echo(f"✓ Added to Meetings: {text} #tags: {','.join(tag_list)}")
@@ -154,7 +168,7 @@ def quick(
     text = validate_text(text)
     tag_list = parse_tags(tags)
 
-    insert_bullet("notes", text, tags=tag_list)
+    _insert_bullet("notes", text, tag_list)
 
     if tag_list:
         typer.echo(f"✓ Added to Quick Notes: {text} #tags: {','.join(tag_list)}")
